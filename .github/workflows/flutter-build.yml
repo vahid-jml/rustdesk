@@ -1,9 +1,12 @@
 name: Build the flutter version of the RustDesk
 
 on:
-  workflow_dispatch:
-  push:
-    branches: [ master ]
+  workflow_call:
+    inputs:
+      upload-artifact:
+        required: false
+        type: boolean
+        default: true
 
 # NOTE: F-Droid builder script 'flutter/build_fdroid.sh' reads environment
 # variables from this workflow!
