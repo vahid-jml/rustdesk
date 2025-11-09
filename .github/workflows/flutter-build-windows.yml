@@ -1,0 +1,49 @@
+name: Build RustDesk for Windows (Flutter UI)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Install prerequisites
+        run: |
+          choco install -y python3 llvm ninja git cmake visualstudio2022buildtools
+          rustup toolchain install stable
+          rustup default stable
+          rustup component add rustfmt
+
+      - name: Install Flutter
+        shell: pwsh
+        run: |
+          git clone https://github.com/flutter/flutter.git -b 3.16.9
+          echo "$PWD/flutter/bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+          flutter --version
+          flutter doctor
+
+      - name: Install Dart and Flutter dependencies
+        working-directory: flutter
+        run: flutter pub get
+
+      - name: Install flutter_rust_bridge_codegen (v1.80.1)
+        run: cargo install flutter_rust_bridge_codegen --version 1.80.1 --features "uuid" --force
+
+      - name: Generate bridge code
+        run: flutter_rust_bridge_codegen --rust-input ./src/flutter_ffi.rs --dart-output ./flutter/lib/generated_bridge.dart
+
+      - name: Build RustDesk (Windows Flutter)
+        shell: pwsh
+        run: python .\build.py --flutter --portable --hwcodec --skip-portable-pack
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: rustdesk-windows
+          path: flutter/build/windows/x64/runner/Release
