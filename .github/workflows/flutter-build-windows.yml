@@ -4,7 +4,6 @@ on:
   workflow_dispatch:
 
 env:
-  RUST_VERSION: "1.75"
   FLUTTER_VERSION: "3.24.5"
   LLVM_VERSION: "15.0.6"
   VCPKG_COMMIT_ID: "120deac3062162151622ca4860575a33844ba10b"
@@ -31,12 +30,11 @@ jobs:
           channel: "stable"
           flutter-version: ${{ env.FLUTTER_VERSION }}
 
-      - name: Install Rust
-        uses: dtolnay/rust-toolchain@v1
-        with:
-          toolchain: ${{ env.RUST_VERSION }}
-          targets: x86_64-pc-windows-msvc
-          components: rustfmt
+      - name: Install latest stable Rust
+        run: |
+          rustup update stable
+          rustup default stable
+          rustc --version
 
       - name: Setup vcpkg
         uses: lukka/run-vcpkg@v11
@@ -49,9 +47,12 @@ jobs:
           $env:VCPKG_DEFAULT_HOST_TRIPLET = "x64-windows-static"
           C:\vcpkg\vcpkg install --triplet x64-windows-static --x-install-root="C:\vcpkg\installed"
 
+      - name: Install flutter_rust_bridge_codegen
+        run: |
+          cargo install flutter_rust_bridge_codegen --version 2.11.1 --locked --force
+
       - name: Generate Flutter Rust Bridge code
         run: |
-          cargo install flutter_rust_bridge_codegen --force
           flutter_rust_bridge_codegen --rust-input ./src/flutter_ffi.rs --dart-output ./flutter/lib/bridge_generated.dart
 
       - name: Build RustDesk (Windows Flutter)
