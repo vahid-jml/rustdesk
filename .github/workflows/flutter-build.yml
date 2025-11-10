@@ -4,9 +4,11 @@ on:
   workflow_call:
     inputs:
       upload-artifact:
-        required: false
         type: boolean
         default: true
+      upload-tag:
+        type: string
+        default: "nightly"
 
 # NOTE: F-Droid builder script 'flutter/build_fdroid.sh' reads environment
 # variables from this workflow!
