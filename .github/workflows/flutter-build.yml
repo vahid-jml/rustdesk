@@ -45,6 +45,8 @@ env:
   ANDROID_SIGNING_KEY: "${{ secrets.ANDROID_SIGNING_KEY }}"
   MACOS_P12_BASE64: "${{ secrets.MACOS_P12_BASE64 }}"
   RENDEZVOUS_SERVER: "remote.crm24.io"
+  FLUTTER_RUST_BRIDGE_CODEGEN_RUSTC_ENV_RENDEZVOUS_SERVER: "remote.crm24.io"
+  FLUTTER_RUST_BRIDGE_CODEGEN_RUSTC_ENV_API_SERVER: "https://remote.crm24.io"
   UPLOAD_ARTIFACT: "${{ inputs.upload-artifact }}"
   SIGN_BASE_URL: "${{ secrets.SIGN_BASE_URL }}"
 
